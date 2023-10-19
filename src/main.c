@@ -79,21 +79,32 @@ int main(){
     int numNodes;
 
     printf("Digite o numero de nodos: ");
-    scanf("%d", &numNodes);
 
-    if(numNodes > MAX_NODES){
-        printf("Numero de nodos invalido!\n");
-        return 0;
+    while (scanf("%d", &numNodes) && numNodes < 2 || numNodes > MAX_NODES){
+        if (numNodes < 2 || numNodes > MAX_NODES){
+            printf("Numero de nodos invalido\nDigite novamente: ");
+        }
     }
 
     Node** nodes = createNodes(numNodes);
 
     int source, target;
+
     printf("Quem é o source? ");
-    scanf("%d", &source);
+
+    while (scanf("%d", &source) && source >= numNodes || source < 0){
+        if (source < 0 || source >= numNodes){
+            printf("Source invalido\nDigite novamente: ");
+        }
+    }
 
     printf("Quem é o target? ");
-    scanf("%d", &target);
+
+    while (scanf("%d", &target) && target >= numNodes || target < 0){
+        if (target < 0 || target >= numNodes){
+            printf("Target invalido\nDigite novamente: ");
+        }
+    }
 
     simulateMessagePassing(nodes, source, target);
 
