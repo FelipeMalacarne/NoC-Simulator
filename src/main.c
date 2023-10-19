@@ -1,22 +1,3 @@
-// NoC simulator in C
-// Em duplas desenvolver um ”simulador”(em software) de um NoC em anel com N nodos
-// Pedir, uma única vez, para o usuário a quantidade de nodos, com limite de 10 nodos
-// Sempre (while(1)) pedir:
-// Quem é o nodo Source?
-// Quem é o nodo Target?
-// Deve-se gerar o log das operações simuladas
-// Ex:
-// Quem é o Source? 0
-// Quem é o Target? 1
-
-// Proc[0] criou a mensagem
-// Proc[0] enviou a mensagem para o Proc[1]
-// Proc[1] recebeu a mensagem de Proc[0]
-// Proc[1] é o destino
-// Proc[1] consumiu a mensagem
-// Algoritmo de arbitragem decide se o pacote é para ser consumido ou repassado adiante
-// Algoritmo de roteamento decide para qual lado enviar (direita, esquerda ou o menor caminho)
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -61,29 +42,7 @@ Node** createNodes(int numNodes) {
     return nodes;
 }
 
-
-int main(){
-
-    int numNodes;
-
-    printf("Digite o numero de nodos: ");
-    scanf("%d", &numNodes);
-
-    if(numNodes > MAX_NODES){
-        printf("Numero de nodos invalido!\n");
-        return 0;
-    }
-
-    Node** nodes = createNodes(numNodes);
-
-
-    int source, target;
-    printf("Quem é o source? ");
-    scanf("%d", &source);
-
-    printf("Quem é o target? ");
-    scanf("%d", &target);
-
+void simulateMessagePassing(Node** nodes, int source, int target) {
     Message* message = (Message*) malloc(sizeof(Message));
     message->id = 0;
     message->source = source;
@@ -113,8 +72,32 @@ int main(){
         }
     }
 
-    return 0;
-
-
+    free(message);
 }
 
+int main(){
+    int numNodes;
+
+    printf("Digite o numero de nodos: ");
+    scanf("%d", &numNodes);
+
+    if(numNodes > MAX_NODES){
+        printf("Numero de nodos invalido!\n");
+        return 0;
+    }
+
+    Node** nodes = createNodes(numNodes);
+
+    int source, target;
+    printf("Quem é o source? ");
+    scanf("%d", &source);
+
+    printf("Quem é o target? ");
+    scanf("%d", &target);
+
+    simulateMessagePassing(nodes, source, target);
+
+    free(nodes);
+
+    return 0;
+}
