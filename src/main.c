@@ -49,18 +49,13 @@ Node* createNode(int id, Node* left, Node* right) {
 Node** createNodes(int numNodes) {
     Node** nodes = (Node**) malloc(numNodes * sizeof(Node*));
 
-    for(int i = 0; i < numNodes; i++){
-        if(i == 0) {
-            nodes[i] = createNode(i, NULL, NULL);
-        } else if(i == numNodes - 1) {
-            nodes[i] = createNode(i, nodes[i-1], nodes[0]);
-            nodes[0]->left = nodes[i];
-        } else {
-            nodes[i] = createNode(i, nodes[i-1], NULL);   
-            nodes[i-1]->right = nodes[i];     
-        }
+    for(int i = 0; i < numNodes; i++) {
+        nodes[i] = createNode(i, NULL, NULL);
+    }
 
-        printf("Node %d criado\n", nodes[i]->id);
+    for(int i = 0; i < numNodes; i++) {
+        nodes[i]->left = nodes[(i - 1 + numNodes) % numNodes];
+        nodes[i]->right = nodes[(i + 1) % numNodes];
     }
 
     return nodes;
@@ -81,6 +76,7 @@ int main(){
 
     Node** nodes = createNodes(numNodes);
 
+
     int source, target;
     printf("Quem é o source? ");
     scanf("%d", &source);
@@ -97,48 +93,24 @@ int main(){
 
     nodes[source]->message = message;
 
+    Node* currentNode = nodes[source];
     
+    printf("Proc[%d] criou a mensagem\n", message->source);
 
     while(1){
-        // Check if there is a message at the current node
         if(nodes[source]->message != NULL) {
-            Message* message = nodes[source]->message;
-            printf("Proc[%d] criou a mensagem\n", message->source);
-
-            // Send the message to the next node
-            Node* nextNode = nodes[source]->right;
-            nextNode->message = message;
-            printf("Proc[%d] enviou a mensagem para o Proc[%d]\n", message->source, nextNode->id);
-
-            // Receive the message at the target node
-            while(nextNode->id != target) {
-                nextNode = nextNode->right;
-                printf("Proc[%d] repassou a mensagem para o Proc[%d]\n", nextNode->left->id, nextNode->id);
-            }
-            printf("SAS");
-
-            printf("Proc[%d] recebeu a mensagem de Proc[%d]\n", nextNode->id, nextNode->left->id);
-
-            // Consume the message at the target node
-            nextNode->message->consumed = 1;
-            printf("Proc[%d] consumiu a mensagem\n", nextNode->id);
-
-            // Arbitration algorithm (always consume the message)
-            if(nextNode->message->consumed) {
-                printf("Algoritmo de arbitragem decidiu consumir a mensagem\n");
+            if(message->target == currentNode->id) {
+                printf("Proc[%d] é o destino\n", currentNode->id);
+                printf("Proc[%d] consumiu a mensagem\n", currentNode->id);
+                nodes[source]->message->consumed = 1;
+                break;
             } else {
-                printf("Algoritmo de arbitragem decidiu repassar a mensagem\n");
+                printf("Proc[%d] enviou a mensagem para o Proc[%d]\n", currentNode->id, currentNode->right->id);
+                printf("Proc[%d] recebeu a mensagem de Proc[%d]\n", currentNode->right->id, currentNode->id);
+                currentNode->right->message = currentNode->message;
+                currentNode = currentNode->right;
             }
-
-            // Routing algorithm (always send the message to the right)
-            nextNode->right->message = nextNode->message;
-            printf("Algoritmo de roteamento decidiu enviar a mensagem para o Proc[%d]\n", nextNode->right->id);
-
-            // Clear the message at the current node
-            nodes[source]->message = NULL;
-
         }
-
     }
 
     return 0;
